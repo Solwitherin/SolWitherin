@@ -1,0 +1,379 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Codex — Memoire</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Jost:wght@300;400;500&display=swap');
+
+  :root {
+    color-scheme: dark;
+    --bg: #0a0810;
+    --accent: #c9436a;
+    --accent2: #7c3aed;
+    --ink: #e8e3ec;
+    --ink-dim: #c7bfcd;
+    --ink-faint: #b9aec4;
+    --label: #8a7f93;
+    --rule: #5f5668;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: var(--bg); }
+  body { color: var(--ink); font-family: 'Jost', sans-serif; }
+  a { color: var(--accent); }
+  a:hover { color: #e85d7f; }
+
+  .page {
+    width: 100%; max-width: 1100px; margin: 0 auto;
+    background:
+      radial-gradient(ellipse 900px 500px at 15% -10%, rgba(124,58,237,0.16), transparent 60%),
+      radial-gradient(ellipse 800px 600px at 110% 20%, rgba(185,28,28,0.14), transparent 55%),
+      var(--bg);
+    padding: 72px 48px 96px;
+  }
+  @media (min-width: 760px) { .page { padding: 96px 88px 120px; } }
+
+  .rule { display: flex; align-items: center; gap: 18px; margin-bottom: 56px; }
+  .rule .line { height: 1px; flex: 1; }
+  .rule .line.l { background: linear-gradient(90deg, transparent, var(--accent) 40%, var(--accent2) 100%); }
+  .rule .line.r { background: linear-gradient(90deg, var(--accent2) 0%, var(--accent) 60%, transparent); }
+  .rule .label { font-size: 12px; letter-spacing: 4px; text-transform: uppercase; color: var(--label); white-space: nowrap; }
+
+  .deadname { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2); margin-bottom: 14px; font-weight: 500; }
+  h1.title {
+    font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(56px, 9vw, 96px);
+    line-height: 0.95; margin: 0 0 18px;
+    background: linear-gradient(120deg, #f3eef7 20%, var(--accent) 60%, var(--accent2) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .epithet { display: flex; align-items: center; gap: 14px; margin-bottom: 64px; }
+  .epithet .tick { width: 28px; height: 1px; background: var(--accent2); }
+  .epithet .text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: 22px; color: var(--ink-faint); }
+
+  .stat-grid { display: grid; grid-template-columns: 1fr; gap: 1px; border-radius: 2px; overflow: hidden; margin-bottom: 44px; background: rgba(201,67,106,0.18); border: 1px solid rgba(201,67,106,0.22); }
+  @media (min-width: 640px) { .stat-grid { grid-template-columns: 1fr 1fr; } }
+  .stat-cell { background: #120e18; padding: 26px 32px; }
+  .stat-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+  .stat-value { font-family: 'Cormorant Garamond', serif; font-size: clamp(26px, 4vw, 36px); color: #f3eef7; font-weight: 500; }
+  .stat-value .sub { font-size: 18px; color: var(--label); font-family: 'Jost', sans-serif; }
+
+  .profile-grid { display: grid; grid-template-columns: 1fr; gap: 1px; background: rgba(201,67,106,0.14); border: 1px solid rgba(201,67,106,0.18); border-radius: 2px; overflow: hidden; margin-bottom: 56px; }
+  @media (min-width: 640px) { .profile-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 900px) { .profile-grid { grid-template-columns: repeat(3, 1fr); } }
+  .profile-cell { background: #0e0c14; padding: 28px 30px; }
+  .profile-label { font-size: 11px; letter-spacing: 3px; text-transform: uppercase; color: var(--label); margin-bottom: 10px; }
+  .profile-value { font-size: 17px; line-height: 1.65; color: var(--ink-dim); }
+
+  .quote { margin: 0 0 88px; padding: 36px 0 36px 28px; border-top: 1px solid rgba(124,58,237,0.25); border-bottom: 1px solid rgba(201,67,106,0.25); }
+  .quote .text { font-family: 'Cormorant Garamond', serif; font-style: italic; font-size: clamp(20px, 3.2vw, 28px); line-height: 1.5; color: #f0e9f5; max-width: 820px; }
+  .quote .by { margin-top: 16px; font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: var(--label); }
+
+  h2.section { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(26px, 4vw, 34px); margin: 0; color: #f3eef7; letter-spacing: 0.5px; }
+  .section-head { display: flex; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+  .section-head .line { height: 1px; flex: 1; background: linear-gradient(90deg, rgba(201,67,106,0.5), transparent); }
+  .section-sub { font-size: 16px; color: var(--label); margin: 0 0 40px; max-width: 760px; line-height: 1.7; }
+
+  /* ---- codex grid ---- */
+  .codex-grid {
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 2px;
+    background: rgba(124,58,237,0.16); border: 1px solid rgba(124,58,237,0.2);
+    border-radius: 2px; overflow: hidden; margin-bottom: 4px;
+  }
+  @media (min-width: 640px) { .codex-grid { grid-template-columns: repeat(4, 1fr); } }
+
+  .codex-box {
+    background: #0e0c14; border: none; cursor: pointer;
+    padding: 28px 16px; text-align: center;
+    font-family: 'Cormorant Garamond', serif; font-size: 20px; color: var(--ink-dim);
+    transition: background 0.2s ease, color 0.2s ease;
+    position: relative;
+  }
+  .codex-box .tag {
+    display: block; font-family: 'Jost', sans-serif; font-size: 10px; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--label); margin-top: 8px;
+  }
+  .codex-box:hover { background: #16111e; color: #f3eef7; }
+  .codex-box:focus-visible { outline: 2px solid var(--accent2); outline-offset: -2px; }
+  .codex-box.active { background: linear-gradient(135deg, rgba(201,67,106,0.18), rgba(124,58,237,0.18)); color: #f3eef7; }
+  .codex-box.active::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+  }
+
+  .detail {
+    margin-top: 40px; margin-bottom: 96px;
+    padding: 52px 48px;
+    border-left: 3px solid var(--accent);
+    background: linear-gradient(135deg, rgba(201,67,106,0.06), rgba(124,58,237,0.05));
+    min-height: 120px;
+  }
+  .detail .d-tag { font-size: 14px; letter-spacing: 3px; text-transform: uppercase; color: var(--accent2); margin-bottom: 14px; }
+  .detail .d-title { font-family: 'Cormorant Garamond', serif; font-weight: 600; font-size: clamp(38px, 6vw, 56px); color: #f3eef7; margin: 0 0 28px; }
+  .detail .d-body { font-size: 22px; line-height: 1.9; color: var(--ink-dim); max-width: 900px; }
+  .detail .d-body p { margin: 0 0 24px; }
+  .detail .d-body p:last-child { margin-bottom: 0; }
+  .detail .d-empty { font-size: 18px; color: var(--label); font-style: italic; }
+
+  .footer { margin-top: 88px; display: flex; align-items: center; gap: 18px; }
+  .footer .line { height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(201,67,106,0.4)); }
+  .footer .label { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--rule); }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="rule">
+    <div class="line l"></div>
+    <div class="label">Codex Entry</div>
+    <div class="line r"></div>
+  </div>
+
+  <div class="deadname">Saint Caelum — deadname</div>
+  <h1 class="title">Memoire</h1>
+  <div class="epithet">
+    <div class="tick"></div>
+    <div class="text">&ldquo;The Sole Witness&rdquo;</div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-cell">
+      <div class="stat-label" style="color:var(--accent)">Height</div>
+      <div class="stat-value">6&prime;5&Prime; <span class="sub">(196 cm)</span></div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-label" style="color:var(--accent2)">Weight</div>
+      <div class="stat-value">225 lb <span class="sub">(102 kg)</span></div>
+    </div>
+  </div>
+
+  <div class="profile-grid">
+    <div class="profile-cell">
+      <div class="profile-label">Eyes</div>
+      <div class="profile-value">Pink-red, black slit pupils</div>
+    </div>
+    <div class="profile-cell">
+      <div class="profile-label">Hair</div>
+      <div class="profile-value">White, shoulder-length, bang falling over the left eye</div>
+    </div>
+    <div class="profile-cell">
+      <div class="profile-label">Body Type</div>
+      <div class="profile-value">Tall, pale, muscular</div>
+    </div>
+    <div class="profile-cell">
+      <div class="profile-label">Personality</div>
+      <div class="profile-value">Composed, unforgiving, grieving, resolute. Speaks rarely, and only once he's already certain.</div>
+    </div>
+    <div class="profile-cell">
+      <div class="profile-label">Mental Health</div>
+      <div class="profile-value">A dissociative structure, in the plainest terms — though in his case the other presences sharing his mind (Ruina, Cedo, Crescendo) are literal rather than symptomatic. Whether that makes it a disorder or simply a fact of what the fall did to him is something even he hasn't resolved.</div>
+    </div>
+  </div>
+
+  <div class="quote">
+    <div class="text">&ldquo;I did not choose to remember them. I chose not to let them be unwritten.&rdquo;</div>
+    <div class="by">&mdash; Memoire</div>
+  </div>
+
+  <div class="section-head">
+    <h2 class="section">The Codex</h2>
+    <div class="line"></div>
+  </div>
+  <p class="section-sub">Select a term to read its entry.</p>
+
+  <div class="codex-grid" id="codex-grid" role="list"></div>
+
+  <div class="detail" id="detail" aria-live="polite">
+    <div class="d-empty">Choose an entry above to begin reading.</div>
+  </div>
+
+  <div class="footer">
+    <div class="line"></div>
+    <div class="label">I &mdash; Codex</div>
+  </div>
+
+</div>
+
+<script>
+  var entries = [
+    {
+      key: "memoire",
+      term: "Memoire",
+      tag: "Identity",
+      body: [
+        "What remains of Saint Caelum carries himself like a record still being written — unhurried, exact, and utterly without the softness his former office once asked of him. He does not walk into a room so much as enter it the way a verdict enters a case: already concluded, simply waiting to be read aloud.",
+        "Where he was once the hand that kept Heaven's truths intact, he is now the hand that ends things it has already judged. His work since the fall has not been chaos — it has been correction, pursued with a scribe's patience rather than a soldier's urgency. He chooses targets the way he once chose which deaths belonged in the codex: deliberately, and only once he is certain of the account.",
+        "He is rarely alone in the strictest sense. Ruina and Cedo sit at the edges of him always, present but not intrusive, and Crescendo waits further back, willing to be quiet until the moment calls for something louder. Most of what looks like solitude in him is actually a kind of ongoing, silent company — four voices that have learned not to speak over one another.",
+        "He speaks rarely, and when he does it carries the flat certainty of something already decided rather than argued. He does not raise his voice to be believed; he has simply never needed to. People who meet him expecting a monster to rant are met instead with something closer to a closing statement — brief, exact, and already final by the time it reaches them.",
+        "Some habits of Saint Caelum survived the fall intact. He still keeps records, in whatever broken, private way is left to him — names, dates, the shape of what he's done — as if some part of him still believes the act of writing something down is what makes it real. It may be the last unbroken piece of who he used to be.",
+        "Underneath all of it is a grief that never resolved into anything gentler than resolve. He did not stop mourning Ruina and Cedo the day he fell, and he has not stopped since. He simply built the rest of himself — Decree, Crescendo, the long patient campaign against the scripture — around the refusal to let their deaths be rewritten, by Heaven or by time.",
+        "He is, in the end, still exactly what his old title said he was: a witness. He has simply run out of patience for anyone who asks him to look away from what he's seen."
+      ]
+    },
+    {
+      key: "caelum",
+      term: "Saint Caelum",
+      tag: "Deadname — former title",
+      body: [
+        "Memoire's name before the fall — a canonized saint of Heaven, writer and guardian of the records kept in its codex. It was not a title of combat or conquest; among Heaven's saints, Caelum's calling was considered a quiet one, almost humble, which made it easy for those above him to forget how much power actually sat in the hands that decided what history would say.",
+        "His days as a saint were built around the codex itself — long hours spent verifying accounts, cross-checking testimonies, deciding which version of an event deserved to be the one that lasted. It was tedious, exacting work, and he was good at it in the specific way that only someone who genuinely cared about getting it right can be.",
+        "He did not work alone. Two lesser scribes were raised up under his watch — Ruina and Cedo — closer to apprentices than assistants, and closer still to family than either. He taught them the discipline of the codex the way an older sibling teaches a craft: patiently, and with more warmth than the role technically required.",
+        "That warmth is, in the end, what undid him. As Saint Caelum, he witnessed an event only he had the eyes to see — Ruina and Cedo, caught and killed in the crossfire of Neveria, Heaven's own weapon, during the long grinding stretch of the thousand year war. He did not need to be told what had happened. He had watched it happen.",
+        "When Heaven came to him afterward — not with grief, but with instructions — and ordered the codex falsified to record their deaths as something other than what they were, he refused outright. Not with anger, not with a speech. He simply would not write the lie, and nothing Heaven offered or threatened changed that.",
+        "For that refusal, he was stripped of his sainthood, his name struck from the very record he had spent his life maintaining, and cast out of Heaven entirely. Saint Caelum does not exist anymore, in any sense Heaven would recognize. What fell in his place is Memoire."
+      ]
+    },
+    {
+      key: "ruina",
+      term: "Ruina",
+      tag: "Spirit — Offense",
+      body: [
+        "A lesser scribe under Saint Caelum — closer to a library assistant than a full archivist, young enough that most of what she knew of the codex she'd learned directly from him. He regarded her as a younger sister rather than a subordinate, and by every account treated her like one: patient with her mistakes, quick to defend her work to anyone who questioned it.",
+        "She was killed in the crossfire of Neveria during the thousand year war, caught in collateral the weapon was never meant to spare. As a spirit now bound into Memoire's Decree, she retains no knowledge of her own death beyond what he himself witnessed — she is suspended permanently at the edges of his memory of that day, not her own, which means there are details of her ending that not even she can answer for.",
+        "Her half of Decree is verdict, not force. Contact — his hand, his weapon, anything he extends it through — marks what it touches as already over. It is not an explosion of violence but a quiet, total certainty: the thing was always going to end this way, and contact is simply the moment that certainty is finally spoken aloud.",
+        "Wounds opened under Ruina do not close, because in the logic of her verdict they were never going to. Flesh does not scar over; stone does not settle into a stable fracture; steel does not hold its edge. Whatever she touches simply stops being whole, by degrees, with no further input required once the verdict has been passed.",
+        "In practice, this makes her deceptively gentle to witness and catastrophic to be on the receiving end of. A blade that only grazes skin under Ruina leaves a wound that never scabs over. A wall Memoire presses a palm to begins to crumble from that single point of contact, slowly and irreversibly, long after he has already walked away and moved on to something else.",
+        "There is no visible flare when Ruina activates, no theatrical surge of force — which is, in its own way, the most unsettling part of her. People rarely realize they've been marked until the slow, growing certainty sets in that whatever was touched is simply not going to be fine, no matter what is done about it afterward."
+      ]
+    },
+    {
+      key: "cedo",
+      term: "Cedo",
+      tag: "Spirit — Defense",
+      body: [
+        "Memoire's other lesser scribe, kin to him in the same way as Ruina — the two of them effectively raised together under his watch, close enough in age and duty that they were rarely spoken of separately. Where Ruina was quicker to push back on his corrections, Cedo was the steadier of the two, content to absorb instruction without needing to argue it first.",
+        "He died alongside her in the same crossfire, the same unchecked structural failure in Neveria that no one had thought to catch in time. As a spirit, he shares Ruina's exact limitation — no memory of the moment of his own death beyond what Memoire personally witnessed, which means his sense of his own ending is, in a very real way, borrowed rather than owned.",
+        "His half of Decree does not block, because yielding was always closer to his nature than resisting was. When Memoire is struck, the point of contact gives way instead of fighting back — unraveling into black binding-strips that fray to ash at their edges before knitting themselves back together a beat later, as though the body had simply declined the hit rather than survived it.",
+        "Nothing about Cedo's defense absorbs or deflects force in the conventional sense. The attack simply finds nothing solid left to land on. Whatever passed through the gap comes out the other side already carrying a trace of Ruina, so the very act of striking Memoire is what marks the striker in return — Cedo's yielding is, in its own quiet way, retaliation.",
+        "In practice, this makes him almost impossible to fight head-on. A sword driven through Memoire's chest meets no resistance at all — the torso unspools into drifting strips and ash, closes again seamlessly behind the blade, and the blade itself withdraws already dulled, its edge pitting visibly where it passed through him.",
+        "There is no stance to break and no parry to read, because Cedo was never built to counter — only to give way exactly long enough for the cost of the attempt to come due. He simply isn't there for the instant it matters, and whoever struck carries what's left of that instant with them afterward."
+      ]
+    },
+    {
+      key: "crescendo",
+      term: "Crescendo",
+      tag: "Predecessor — obtained tier",
+      body: [
+        "A fallen predecessor who claimed Memoire mid-fall from Heaven — not Heaven's doing, but something encountered in the long space between falling and landing. Crescendo had been there a very long time before Memoire arrived, cast out of Heaven generations earlier for opposing something strikingly similar to what Memoire himself would eventually refuse to look away from.",
+        "Theirs is not a possession in any conventional sense. Crescendo does not fight Memoire for control, does not whisper temptations, does not need to be resisted. The two share one body because they arrived at the same conclusion from different centuries: that the scripture Heaven stands on deserves to answer for what it's done, and neither of them particularly cares which of them is the one holding the hand that delivers the answer.",
+        "What binds them is not compulsion but recognition — two witnesses who were punished for seeing clearly, meeting in the one place neither of them was ever meant to end up. Crescendo wants nothing from Memoire specifically. The goal was already theirs before Memoire fell into it, and Memoire simply inherited a cause that was waiting for him.",
+        "Where Decree is quiet and personal, built from grief Memoire still carries by name, Crescendo is loud, old, and impersonal in a way that makes it the more frightening of the two tiers. It does not need to be earned twice and carries no memory of restraint, because restraint was never part of what cast it down in the first place.",
+        "Crescendo's power manifests as great dark hands erupting from the ground, from shadow, from wherever a mark has already taken hold — reaching to crush, impale, or simply drag a target somewhere they cannot escape from. These are not restraints. They are built to end things outright, the way a verdict doesn't ask twice.",
+        "On impact, matter does not explode outward the way ordinary violence does — it folds inward on itself first, buckling toward a single point, before detonating a beat later with force born from that collapse. It is Ruina's slower verdict compressed into an instant: not destruction so much as a sentence being carried out all at once instead of gradually.",
+        "At its smallest, Crescendo is a single reaching hand, surgical and precise. At its largest, it becomes a full domain — hundreds of arms erupting across an entire space at once, so that nowhere in it offers solid footing and nothing that touches those hands escapes being marked the way Cedo marks whatever strikes Memoire directly."
+      ]
+    },
+    {
+      key: "neveria",
+      term: "Neveria",
+      tag: "Heaven's Mistake",
+      body: [
+        "The mass-destruction weapon Heaven deployed during the back half of the thousand year war, built at a point when quieter methods of suppressing the Unwritten had stopped working fast enough to matter. Where the codex had always erased selectively, one falsified entry at a time, Neveria was conceived as something far blunter: erasure with nothing left over to need erasing afterward.",
+        "It was not a precision instrument. Its design prioritized totality over control — Heaven's command structure had grown weary of a war fought over what got to be remembered, and Neveria was the answer to an argument they'd decided they would rather simply end than keep having. Where it was deployed, very little remained to argue about.",
+        "Its use was rare even within the war, reserved for concentrations of the Unwritten large enough that Heaven judged the risk worth the cost. Each deployment required extensive preparation, and each one was, in theory, contained well away from Heaven's own forces — a margin of safety that depended entirely on maintenance no one had kept current.",
+        "The misfire that killed Ruina and Cedo was not sabotage and not enemy action. It was the long, unglamorous consequence of structural failures that had gone unchecked for longer than anyone wanted to admit on a weapon Heaven had hoped it would rarely, if ever, need to use again. The crossfire reached further than its operators believed it could.",
+        "Heaven's response to that failure was not an inquiry into the weapon or the men responsible for its upkeep. It was an order to the codex: record the deaths as something other than what they were. Neveria's failure was treated as an embarrassment to be filed away, not a cost to be reckoned with — which is precisely the instruction Saint Caelum refused to carry out.",
+        "In the years since, Neveria has become something closer to an open wound in Memoire's own story than a weapon with a name and a history. He does not speak of it unless pressed, and when he does, it is never described as an accident. To him, it was simply Heaven's negligence finally landing on the two people it could least afford to lose."
+      ]
+    },
+    {
+      key: "scripture",
+      term: "Heaven / The Scripture",
+      tag: "Institution",
+      body: [
+        "Memoire's former house, and the doctrine that governed it — not a single figure or throne, but a body of law and precedent that every saint, including Caelum, once answered to without question. The scripture was less a religious text in the way the word usually implies and more a living legal order: the accumulated decisions of what Heaven would and would not permit to be true.",
+        "Falsifying the codex was not, as it turned out, an unusual request made only once, in Memoire's case. It was standard practice, refined over the long centuries of the war into something close to procedure — a quiet habit of smoothing over anything that made Heaven's conduct look less than righteous, one convenient omission at a time.",
+        "It was this very habit that gave rise to the Unwritten in the first place, and it was this same habit, applied once more without hesitation, that Heaven expected Saint Caelum to continue without complaint when it came to Ruina and Cedo. That he didn't is, as far as Heaven's own records are concerned, a minor administrative incident. As far as Memoire is concerned, it is the only honest thing he ever did in that role.",
+        "When Neveria killed two of its own scribes, Heaven's priority was never accountability — it was continuity, the uninterrupted appearance of a doctrine that has never been wrong about anything, least of all itself. Memoire's refusal to comply is what ended his sainthood, but the scripture itself was never put on trial for what it asked of him.",
+        "That is, specifically, what Memoire and Crescendo intend to correct. Not Heaven as a place, not any single saint or throne within it, but the scripture itself — the doctrine that made falsification routine long before Caelum ever refused it, and that has gone on, uninterrupted, ever since he fell."
+      ]
+    },
+    {
+      key: "war",
+      term: "The Thousand Year War",
+      tag: "Event",
+      body: [
+        "The war did not begin as a war. It began as an accounting problem — centuries of lesser erasures, inconvenient deaths and unrecorded dissent that Heaven's codex quietly smoothed over, one falsified entry at a time, until what had been scrubbed from the record started scrubbing back.",
+        "Those cast out, forgotten, or deliberately unwritten over the long centuries before the war did not simply vanish. They gathered in the spaces between — the same in-between Memoire himself would later fall through — and took a name for what Heaven had made them: the Unwritten. What Heaven refused to record, they decided, Heaven would be made to answer for.",
+        "For the better part of a thousand years, the war was fought less with armies than with permanence. Heaven's advantage had always been the codex itself — the simple, brutal truth that what wasn't written down was easier to deny than to defeat. The Unwritten understood this instinctively; their whole cause was built on it. So the war became, in practice, a war over what got to be true.",
+        "Saint Caelum served through the back half of it, one scribe among many whose duty was never to fight but to record — casualties, decrees, the slow erosion of both sides' certainty that the war would ever actually end. Ruina and Cedo were raised into that duty under him, too young to remember a world not already at war.",
+        "Neveria was Heaven's answer to a war it could no longer afford to keep losing quietly. Where the codex had always erased selectively, Neveria was built to erase absolutely — a weapon with no discrimination in its targets, meant to end concentrations of the Unwritten with a finality no falsified record would even need to cover up, because there would be nothing left to need covering. It was less a tool of war than a tool of permanent silence.",
+        "It was never meant to be fired anywhere near its own scribes. The structural failures that let it reach Ruina and Cedo were not sabotage, not enemy action — simply decades of maintenance Heaven had deferred on a weapon it hoped it would never actually have to use twice. The war's true casualty count was never finished. Caelum's refusal to finish it for two more names is the only reason anyone outside Heaven knows that cost at all."
+      ]
+    },
+    {
+      key: "fall",
+      term: "The Fall",
+      tag: "Event",
+      body: [
+        "There was no trial in the way the word usually implies — no chamber, no accusers, no chance to answer for himself a second time. Heaven does not debate its scripture. It simply convenes, decides, and acts, and Saint Caelum's sentence was passed with the same procedural efficiency he had spent his whole life serving.",
+        "The stripping itself was the cruelest part, because it was done in the one language he had always trusted completely: the codex's own. His name was located, located precisely, and struck — not torn out, not burned, simply edited, the way any other inconvenient entry had ever been edited. He watched the same tool he'd devoted his life to turned, for the first time, on him.",
+        "What followed was not a sentencing but a release — Heaven does not imprison what it casts out, it simply stops holding on. He was let go the way a hand opens, and the fall that followed had no visible bottom, no sense of speed, only the slow and total understanding that he was no longer where he had always been.",
+        "The space between is not empty, whatever Heaven's own doctrine claims about it. It has a texture — old, cold, and strangely patient, as though everything that had ever fallen through it was still down there somewhere, waiting to see what the next arrival would become. Caelum fell through it for longer than he could measure, time having very little meaning once there was no ground to count against.",
+        "It was there that Crescendo found him — or more accurately, recognized him. There was no struggle, no claiming in the violent sense the word usually carries. Crescendo had been waiting in that in-between for longer than Caelum had been alive, and what passed between them in that moment was closer to a question answered than a power seized: are you also one of the ones who saw too much?",
+        "What Crescendo gave him was not strength so much as company, and the power that came with it arrived almost as an afterthought to the recognition itself. By the time he landed — wherever landing even meant, for something no longer bound to Heaven's geography — he was no longer simply a cast-out saint. He was something Crescendo had made room for.",
+        "He has never described the fall as the moment he lost himself. If anything, it is the only part of the whole story he speaks of with something close to relief — the point where falling, finally, stopped being something done to him, and started being something he survived."
+      ]
+    },
+    {
+      key: "acts",
+      term: "Record of Acts",
+      tag: "Since the Fall",
+      body: [
+        "He still keeps a record, in the only form left to him — fragments, unbound, written in a hand only he would recognize as the same one that once kept Heaven's codex. What follows are the ones he has let stand, written as he wrote them.",
+        "<em>On the first outpost:</em> A minor archive-house, low in Heaven's hierarchy, kept records no one above it cared to check. I did not burn it. I corrected it — every falsified entry restored to what it should have said, before I left nothing standing that could falsify it again.",
+        "<em>On the magistrate who signed the order:</em> He did not remember my name when I gave it. He remembered it before the end. I did not ask forgiveness of him, and he did not think to ask it of me. Some debts are not owed in that direction.",
+        "<em>On the search:</em> I have not found the rest of what the Unwritten became, if anything of them remains to be found. I continue to look. If they are still down there, they are owed an accounting no less than Ruina and Cedo are.",
+        "<em>On Crescendo's silence:</em> There are days it says nothing at all, content to let me work alone. I have stopped mistaking that silence for absence. It is patience, the same as mine, simply older.",
+        "<em>On what comes next:</em> The scripture does not know yet that it is being read back to itself. It will. I am in no hurry — I have already waited longer than most would call reasonable, and I have never once needed to be fast to be thorough."
+      ]
+    },
+    {
+      key: "edictum",
+      term: "Edictum",
+      tag: "Memoire's Weapon",
+      body: [
+        "A spear, roughly two meters from haft to point, carried the way Rerir carries his own — close kin in silhouette, though nothing about Edictum was ever Heaven-made. Its shaft is a dark, almost black material that doesn't quite read as wood or metal, wrapped along its length in the same black binding-strips that unravel from Memoire's own body under Cedo, as if the weapon and the man were cut from the same cloth and never fully separated.",
+        "The head is long, narrow, and asymmetrical — less a blade shaped for cutting than a point shaped for finality, more quill than sword if a quill were forged to end arguments rather than record them. It catches almost no light. What little it does catch comes out wrong, a faint pink-red undertone bleeding along the edge the same way it bleeds beneath his own skin.",
+        "Edictum does not need Decree spoken or summoned to carry it — Ruina's verdict runs through the weapon natively, the way ink runs through a nib. A strike that draws blood draws the same sentence his bare hand would pass: whatever it touches is already ruined, already ending, whether or not the wound itself looks severe.",
+        "Where the bindings along the haft fray and lift, faint traces of ash drift free with every strike, settling and vanishing before they ever hit the ground — Cedo's signature as much as Ruina's, a reminder that the spear, like the man who carries it, gives ground rather than breaks when something tries to meet it head-on.",
+        "He rarely draws it unless he intends for whatever he's about to do to be final. Edictum is not a weapon for warnings — in the same way nothing in Decree carries a warning shot, the spear exists for the moment after the verdict has already been read, when all that's left is for someone to act on it.",
+        "Its name is his own choosing, not Heaven's — Latin for a decree proclaimed, a judgment given force. It is, in its own way, the closest thing he has to a signature: the last document Saint Caelum ever wrote, and the first weapon Memoire ever needed."
+      ]
+    }
+  ];
+
+  var grid = document.getElementById('codex-grid');
+  var detail = document.getElementById('detail');
+
+  entries.forEach(function (entry) {
+    var btn = document.createElement('button');
+    btn.className = 'codex-box';
+    btn.type = 'button';
+    btn.setAttribute('role', 'listitem');
+    btn.setAttribute('aria-pressed', 'false');
+    btn.dataset.key = entry.key;
+    btn.innerHTML = entry.term + '<span class="tag">' + entry.tag + '</span>';
+    btn.addEventListener('click', function () { selectEntry(entry.key); });
+    grid.appendChild(btn);
+  });
+
+  function selectEntry(key) {
+    var entry = entries.filter(function (e) { return e.key === key; })[0];
+    if (!entry) return;
+
+    Array.prototype.forEach.call(grid.children, function (box) {
+      var isActive = box.dataset.key === key;
+      box.classList.toggle('active', isActive);
+      box.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
+
+    var bodyHtml = entry.body.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+    detail.innerHTML =
+      '<div class="d-tag">' + entry.tag + '</div>' +
+      '<h3 class="d-title">' + entry.term + '</h3>' +
+      '<div class="d-body">' + bodyHtml + '</div>';
+  }
+</script>
+</body>
+</html>
